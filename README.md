@@ -6,7 +6,7 @@
 <div style="text-align: justify">
 
 ### PV and PVC - MySQL Deployment + Wordpress + PhpMyAdmin
-The following config file describes a single-instance MySQL Deployment. The MySQL container mounts the PV at `/var/lib/mysql`. The `MYSQL_ROOT_PASSWORD` environment variable sets the database password from the Secret.
+The following config file describes a single-instance MySQL Deployment. The MySQL container mounts the PV at `/var/lib/mysql`. The `MYSQL_ROOT_PASSWORD`, `MYSQL_USER` environment variable sets the database password from the Secret.
 
 1. Web Application (Wordpress)
 2. MySQl Database
