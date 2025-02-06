@@ -1,0 +1,61 @@
+# MySQl Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql-container
+        image: mysql:5.6
+        env:
+          - name: MYSQL_ROOT_PASSWORD 
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql-pass
+          - name: MYSQL_DATABASE 
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql-db 
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+          - name:  mysql-persistent-storage
+            mountPath:  /var/lib/mysql
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+        - name:  mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+---
+# MySQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  labels:
+    app: mysql 
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+    targetPort: 3306

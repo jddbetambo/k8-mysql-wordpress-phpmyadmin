@@ -1,0 +1,59 @@
+# PhpMyAdmin deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+      - name: phpmyadmin
+        image: phpmyadmin/phpmyadmin:latest
+        env:
+        - name: PMA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-cm
+              key: mysql-url
+        - name: PMA_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-user
+        - name: PMA_PASSWORD 
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-pass
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+# PhpMyAdmin Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin-service
+  labels:
+    app: phpmyadmin 
+spec:
+  type: NodePort
+  selector:
+    app: phpmyadmin
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30002
